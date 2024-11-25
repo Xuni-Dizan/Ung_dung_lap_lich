@@ -4,11 +4,28 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f9acab3f-a025-4982-8fe1-8963004b02ea" name="Changes" comment="" />
+    <list default="true" id="f9acab3f-a025-4982-8fe1-8963004b02ea" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/controller/CalendarController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/view/CalendarEventHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/view/CalendarGUI.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/view/DailyPlan.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/view/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Ung_dung_lap_lich.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Ung_dung_lap_lich.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -17,17 +34,28 @@
   &quot;associatedIndex&quot;: 3
 }</component>
   <component name="ProjectId" id="2oD5IBflNmoG77VB1JHu1QpBdRC" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.CalendarGUI.executor": "Run",
+    "Application.CalenderGUI.executor": "Run",
+    "Application.DailyPlan.executor": "Run",
+    "Application.Main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "Dai23130039",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Dizan/IdeaProjects/Ung_dung_lap_lich",
-    "onboarding.tips.debug.path": "C:/Users/Dizan/IdeaProjects/Ung_dung_lap_lich/src/Main.java"
+    "last_opened_file_path": "C:/Users/Dizan/IdeaProjects/Project_giua_ki/Ung_dung_lap_lich/lib/jcalendar-1.4.jar",
+    "onboarding.tips.debug.path": "C:/Users/Dizan/IdeaProjects/Ung_dung_lap_lich/src/Main.java",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2"
   }
 }]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -40,16 +68,5 @@
       <updated>1730391225805</updated>
     </task>
     <servers />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Main.java</url>
-          <line>11</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
