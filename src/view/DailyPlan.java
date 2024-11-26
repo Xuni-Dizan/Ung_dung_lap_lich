@@ -1,71 +1,215 @@
 package view;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import com.toedter.calendar.JDateChooser;
 import java.awt.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Calendar;
 
 public class DailyPlan extends JFrame {
-    public DailyPlan() {
-        // Thiết lập tiêu đề cửa sổ
-        setTitle("Lịch trong ngày");
-        setSize(600, 400);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+    private JDateChooser dateChooser;
+
+    private void createAndShowGUI() {
+        // Set Look and Feel to "Nimbus" for better aesthetics
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Create Main Frame
+        setTitle("PlanADay");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(800, 400);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Panel chứa thanh điều hướng
-        JPanel navigationPanel = new JPanel();
-        navigationPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
-
-        // Các nút và combo box ngày tháng
-        JButton btnYesterday = new JButton("Hôm qua");
-        JComboBox<String> cbDay = new JComboBox<>();
-        JComboBox<String> cbMonth = new JComboBox<>();
-        JComboBox<String> cbYear = new JComboBox<>();
-        JButton btnTomorrow = new JButton("Ngày mai");
-
-        // Thêm các lựa chọn ngày tháng vào combo box
-        for (int i = 1; i <= 31; i++) {
-            cbDay.addItem(String.valueOf(i));
-        }
-        for (int i = 1; i <= 12; i++) {
-            cbMonth.addItem("Tháng " + i);
-        }
-        for (int i = 2000; i <= 2100; i++) {
-            cbYear.addItem(String.valueOf(i));
-        }
-
-        // Đặt ngày hiện tại làm mặc định
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        String[] currentDate = dateFormat.format(new Date()).split("-");
-        cbDay.setSelectedItem(currentDate[0]);
-        cbMonth.setSelectedItem("Tháng " + Integer.parseInt(currentDate[1]));
-        cbYear.setSelectedItem(currentDate[2]);
-
-        // Thêm các nút và combo box vào panel
-        navigationPanel.add(btnYesterday);
-        navigationPanel.add(cbDay);
-        navigationPanel.add(cbMonth);
-        navigationPanel.add(cbYear);
-        navigationPanel.add(btnTomorrow);
-
-        // Panel chính chứa nội dung
+        // Tạo panel chính
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
-        JLabel emptyLabel = new JLabel(); // Nhãn trống để giữ bố cục
-        mainPanel.add(emptyLabel, BorderLayout.CENTER);
 
-        // Thêm panel vào cửa sổ chính
-        add(navigationPanel, BorderLayout.NORTH);
+        // Thanh tab
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Hằng ngày", createTodayPanel()); // Tab
+        tabbedPane.addTab("Word", new JPanel()); // Tab
+        mainPanel.add(tabbedPane, BorderLayout.CENTER);
+
+        // Add the mainPanel to the JFrame
         add(mainPanel, BorderLayout.CENTER);
+
+        // Make the frame visible
+        setVisible(true);
+    }
+
+    private JPanel createTodayPanel() {
+        JPanel todayPanel = new JPanel();
+        todayPanel.setLayout(new BorderLayout());
+
+        // Top Panel for Navigation and Date
+        JPanel topPanel = new JPanel(new BorderLayout());
+        JPanel topPanel_center = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel topPanel_right = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel topPanel_left = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        topPanel.add(topPanel_center, BorderLayout.CENTER);
+        topPanel.add(topPanel_right, BorderLayout.EAST);
+        topPanel.add(topPanel_left, BorderLayout.WEST);
+        JButton btnYesterday = new JButton("Hôm qua");
+        JButton btnToday = new JButton("Hôm nay");
+        JButton btnTomorrow = new JButton("Ngày mai");
+        JButton btnAddTask = new JButton("Thêm");
+
+        dateChooser = new JDateChooser();
+        dateChooser.setPreferredSize(new Dimension(150, 35));
+        dateChooser.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        dateChooser.setDateFormatString("dd/MM/yyyy");
+        dateChooser.setToolTipText("Chọn ngày để lập lịch");
+        dateChooser.setDate(Calendar.getInstance().getTime()); // Hiển thị ngày hiện tại
+        topPanel_center.add(btnYesterday);
+        topPanel_center.add(dateChooser);
+        topPanel_center.add(btnTomorrow);
+        topPanel_right.add(btnToday);
+        topPanel_left.add(btnAddTask);
+        todayPanel.add(topPanel, BorderLayout.NORTH);
+
+        // Task Table Panel
+        JPanel tablePanel = new JPanel();
+        tablePanel.setLayout(new BorderLayout());
+        tablePanel.setBorder(BorderFactory.createTitledBorder("Danh sách công việc"));
+
+        // Create Table Columns
+        String[] columnNames = {"", "Task", "Start Time", "End Time", "Status", "Edit", "Delete"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                switch (columnIndex) {
+                    case 0: return Boolean.class; // Checkbox column
+                    case 5: case 6: return JButton.class; // Edit and Delete buttons
+                    default: return String.class;
+                }
+            }
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column != 0; // Only the checkbox is not editable
+            }
+        };
+
+        // Sample Data
+        Object[][] rowData = {
+                {false, "Test", "08:00", "09:00", "Doing", new JButton("Edit"), new JButton("Delete")},
+                {false, "Kết thúc demo video", "10:00", "12:00", "Doing", new JButton("Edit"), new JButton("Delete")},
+                {false, "Việc đã bị trễ", "14:00", "15:00", "Coming", new JButton("Edit"), new JButton("Delete")}
+        };
+
+        for (Object[] row : rowData) {
+            tableModel.addRow(row);
+        }
+
+        // Create Table
+        JTable taskTable = new JTable(tableModel);
+        taskTable.setRowHeight(30);
+
+        // Customize Column Widths
+        taskTable.getColumnModel().getColumn(0).setPreferredWidth(30); // Checkbox
+        taskTable.getColumnModel().getColumn(1).setPreferredWidth(300); // Task Name
+        taskTable.getColumnModel().getColumn(2).setPreferredWidth(100); // Start Time
+        taskTable.getColumnModel().getColumn(3).setPreferredWidth(100); // End Time
+        taskTable.getColumnModel().getColumn(4).setPreferredWidth(100); // Status
+        taskTable.getColumnModel().getColumn(5).setPreferredWidth(80); // Edit Button
+        taskTable.getColumnModel().getColumn(6).setPreferredWidth(80); // Delete Button
+
+        // Add ActionListener for Edit button
+        taskTable.getColumn("Edit").setCellEditor(new ButtonEditor(new JButton("Edit")));
+        taskTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JButton("Delete")));
+
+        // Add Button Action Listeners for "Edit" and "Delete"
+        taskTable.getColumn("Edit").setCellRenderer(new ButtonRenderer("Edit"));
+        taskTable.getColumn("Delete").setCellRenderer(new ButtonRenderer("Delete"));
+
+        // Add Dropdown Editor for "Status"
+        JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Done", "Missed", "Doing", "Coming"});
+        taskTable.getColumnModel().getColumn(4).setCellEditor(new DefaultCellEditor(statusComboBox));
+
+        // Add Scroll Pane for Table
+        JScrollPane scrollPane = new JScrollPane(taskTable);
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+
+        // Footer Panel
+        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel lblSummary = new JLabel("Tổng: 14 việc | Done: 0 | Missed: 12 | Doing: 2 | Coming: 0");
+        footerPanel.add(lblSummary);
+        todayPanel.add(footerPanel, BorderLayout.SOUTH);
+
+        // Add Panels to Frame
+        todayPanel.add(tablePanel, BorderLayout.CENTER);
+
+        // Add Button Actions for navigation
+        btnYesterday.addActionListener(e -> JOptionPane.showMessageDialog(this, "Yesterday's tasks."));
+        btnTomorrow.addActionListener(e -> JOptionPane.showMessageDialog(this, "Tomorrow's tasks."));
+
+        return todayPanel;
+    }
+
+    // Renderer for JButton in JTable (Custom Button Renderer)
+    private class ButtonRenderer extends JButton implements TableCellRenderer {
+        private String label;
+
+        public ButtonRenderer(String label) {
+            this.label = label;
+            setText(label);
+            setFocusPainted(false); // Không vẽ viền khi nhấn
+            setBackground(Color.LIGHT_GRAY); // Thêm màu nền cho đẹp mắt
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            return this; // Trả về nút khi cần hiển thị trong bảng
+        }
+    }
+
+    // ButtonEditor
+    private class ButtonEditor extends AbstractCellEditor implements TableCellEditor {
+        private JButton button;
+
+        public ButtonEditor(JButton button) {
+            this.button = button;
+            this.button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // Xử lý sự kiện ngay lập tức khi nút được nhấn
+                    if (button.getText().equals("Edit")) {
+                        JOptionPane.showMessageDialog(null, "Edit Button Clicked");
+                    } else if (button.getText().equals("Delete")) {
+                        JOptionPane.showMessageDialog(null, "Delete Button Clicked");
+                    }
+                    stopCellEditing();  // Dừng chỉnh sửa ngay sau khi nhấn nút
+                }
+            });
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return button;
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            return button;
+        }
     }
 
     public static void main(String[] args) {
-        // Tạo giao diện và hiển thị
-        SwingUtilities.invokeLater(() -> {
-            DailyPlan dailyPlan = new DailyPlan();
-            dailyPlan.setVisible(true);
-        });
+        // Call the method to create and show the GUI
+        SwingUtilities.invokeLater(() -> new DailyPlan().createAndShowGUI());
     }
 }
