@@ -5,15 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9acab3f-a025-4982-8fe1-8963004b02ea" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controller/CalendarController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/view/CalendarEventHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/view/CalendarGUI.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/view/DailyPlan.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/view/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Ung_dung_lap_lich.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Ung_dung_lap_lich.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/view/DailyPlan.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/DailyPlan.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +44,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "Dai23130039",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Dizan/IdeaProjects/Project_giua_ki/Ung_dung_lap_lich/lib/jcalendar-1.4.jar",
+    "last_opened_file_path": "C:/Users/Dizan/IdeaProjects/ComputerManagementSystem-main/ComputerManagementSystem-main",
     "onboarding.tips.debug.path": "C:/Users/Dizan/IdeaProjects/Ung_dung_lap_lich/src/Main.java",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
