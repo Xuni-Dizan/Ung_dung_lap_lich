@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 
+import static javax.swing.BorderFactory.*;
+
 public class DailyPlan extends JFrame {
 
     private JDateChooser dateChooser;
@@ -28,7 +30,7 @@ public class DailyPlan extends JFrame {
         }
 
         // Create Main Frame
-        setTitle("PlanADay");
+        setTitle("Daily Plan");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 400);
         setLocationRelativeTo(null);
@@ -40,8 +42,65 @@ public class DailyPlan extends JFrame {
 
         // Thanh tab
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Hằng ngày", createTodayPanel()); // Tab
+        tabbedPane.addTab("Daily", createTodayPanel()); // Tab
         tabbedPane.addTab("Word", new JPanel()); // Tab
+
+        // Thêm JPanel chứa nút "Add" vào phía trên JTabbedPane
+        JPanel addButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        addButtonPanel.setOpaque(false); // Đảm bảo rằng nó không có nền
+        JButton btnAddTab = new JButton(new ImageIcon("path/to/plus-icon.png")); // Sử dụng icon dấu cộng
+        btnAddTab.setPreferredSize(new Dimension(40, 40)); // Kích thước nút
+        btnAddTab.setBackground(new Color(52, 152, 219)); // Màu nền đẹp
+        btnAddTab.setForeground(Color.WHITE); // Màu chữ
+        btnAddTab.setBorder(createLineBorder(Color.GRAY, 1, true)); // Viền tròn cho nút
+        btnAddTab.setFocusPainted(false); // Bỏ viền focus
+        btnAddTab.setToolTipText("Add New Tab"); // Thêm tooltip để hiển thị khi người dùng di chuột qua nút
+
+        // Tạo sự kiện click cho nút "Add"
+        btnAddTab.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int newTabIndex = tabbedPane.getTabCount() + 1; // Tạo index cho tab mới
+                tabbedPane.addTab("New Tab " + newTabIndex, new JPanel()); // Thêm tab mới
+                tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1); // Chọn tab mới
+            }
+        });
+
+        addButtonPanel.add(btnAddTab);  // Thêm nút vào panel
+
+        // Tạo nút "Delete" để xóa tab
+//        JPanel deleteButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+//        deleteButtonPanel.setOpaque(false); // Đảm bảo rằng nó không có nền
+//        JButton btnDeleteTab = new JButton("Xóa Tab");
+//        btnDeleteTab.setBackground(Color.RED); // Màu nền nút
+//        btnDeleteTab.setForeground(Color.WHITE); // Màu chữ
+//        btnDeleteTab.setFont(new Font("Arial", Font.PLAIN, 14)); // Kích thước chữ
+//        btnDeleteTab.setBorder(createEmptyBorder(10, 20, 10, 20)); // Viền mỏng
+//        btnDeleteTab.setFocusPainted(false); // Bỏ viền focus
+//        btnDeleteTab.setToolTipText("Xóa tab hiện tại"); // Thêm tooltip
+
+        // Tạo sự kiện click cho nút "Delete"
+//        btnDeleteTab.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                // Xóa tab hiện tại
+//                int selectedIndex = tabbedPane.getSelectedIndex();
+//                if (selectedIndex != -1) {
+//                    tabbedPane.removeTabAt(selectedIndex);
+//                }
+//            }
+//        });
+
+//        deleteButtonPanel.add(btnDeleteTab); // Thêm nút "Delete" vào panel
+//
+//        // Add cả hai nút vào phần trên của JTabbedPane
+//        JPanel topPanel = new JPanel();
+//        topPanel.setLayout(new BorderLayout());
+//        topPanel.add(addButtonPanel, BorderLayout.WEST);
+//        topPanel.add(deleteButtonPanel, BorderLayout.EAST);
+
+        // Add top panel vào JFrame
+//        mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
 
         // Add the mainPanel to the JFrame
@@ -63,10 +122,10 @@ public class DailyPlan extends JFrame {
         topPanel.add(topPanel_center, BorderLayout.CENTER);
         topPanel.add(topPanel_right, BorderLayout.EAST);
         topPanel.add(topPanel_left, BorderLayout.WEST);
-        JButton btnYesterday = new JButton("Hôm qua");
-        JButton btnToday = new JButton("Hôm nay");
-        JButton btnTomorrow = new JButton("Ngày mai");
-        JButton btnAddTask = new JButton("Thêm");
+        JButton btnYesterday = new JButton("Yesterday");
+        JButton btnToday = new JButton("Today");
+        JButton btnTomorrow = new JButton("Tomorrow");
+        JButton btnAddTask = new JButton("Add task");
 
         dateChooser = new JDateChooser();
         dateChooser.setPreferredSize(new Dimension(150, 35));
@@ -84,7 +143,7 @@ public class DailyPlan extends JFrame {
         // Task Table Panel
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new BorderLayout());
-        tablePanel.setBorder(BorderFactory.createTitledBorder("Danh sách công việc"));
+        tablePanel.setBorder(createTitledBorder("List word"));
 
         // Create Table Columns
         String[] columnNames = {"", "Task", "Start Time", "End Time", "Status", "Edit", "Delete"};
@@ -107,7 +166,7 @@ public class DailyPlan extends JFrame {
         // Sample Data
         Object[][] rowData = {
                 {false, "Test", "08:00", "09:00", "Doing", new JButton("Edit"), new JButton("Delete")},
-                {false, "Kết thúc demo video", "10:00", "12:00", "Doing", new JButton("Edit"), new JButton("Delete")},
+                {false, "Kết thúc demo", "10:00", "12:00", "Doing", new JButton("Edit"), new JButton("Delete")},
                 {false, "Việc đã bị trễ", "14:00", "15:00", "Coming", new JButton("Edit"), new JButton("Delete")}
         };
 
@@ -146,7 +205,7 @@ public class DailyPlan extends JFrame {
 
         // Footer Panel
         JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel lblSummary = new JLabel("Tổng: 14 việc | Done: 0 | Missed: 12 | Doing: 2 | Coming: 0");
+        JLabel lblSummary = new JLabel("Total: 14 words | Done: 0 | Missed: 12 | Doing: 2 | Coming: 0");
         footerPanel.add(lblSummary);
         todayPanel.add(footerPanel, BorderLayout.SOUTH);
 
