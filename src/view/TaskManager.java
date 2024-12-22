@@ -2,57 +2,65 @@
 package view;
 
 import java.io.*;
-import java.time.LocalDate;
 import java.util.*;
 
 public class TaskManager implements Serializable {
     private static final long serialVersionUID = 1L;
-    private Map<LocalDate, List<Task>> tasksByDate = new HashMap<>();
+    private Map<String, List<Task>> tasksByKey = new HashMap<>();
 
     // Tải dữ liệu từ tệp
     public void loadFromFile(String filePath) {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            tasksByDate = (Map<LocalDate, List<Task>>) ois.readObject();
+            tasksByKey = (Map<String, List<Task>>) ois.readObject();
         } catch (Exception e) {
-            tasksByDate = new HashMap<>(); // Nếu tệp không tồn tại hoặc lỗi
+            tasksByKey = new HashMap<>(); // Nếu tệp không tồn tại hoặc lỗi
         }
     }
 
     // Lưu dữ liệu vào tệp
     public void saveToFile(String filePath) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            oos.writeObject(tasksByDate);
+            oos.writeObject(tasksByKey);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // Thêm công việc
-    public void addTask(LocalDate date, Task task) {
-        tasksByDate.computeIfAbsent(date, k -> new ArrayList<>()).add(task);
+    // Thêm công việc với khóa kết hợp
+    public void addTask(String key, Task task) {
+        tasksByKey.computeIfAbsent(key, k -> new ArrayList<>()).add(task);
     }
 
-    // Lấy danh sách công việc
-    public List<Task> getTasksForDate(LocalDate date) {
-        return tasksByDate.getOrDefault(date, new ArrayList<>());
+    // Lấy danh sách công việc với khóa kết hợp
+    public List<Task> getTasksForKey(String key) {
+        return tasksByKey.getOrDefault(key, new ArrayList<>());
     }
 
-    // Xóa công việc
-    public void removeTask(LocalDate date, Task task) {
-        List<Task> tasks = tasksByDate.get(date);
+    // Xóa công việc với khóa kết hợp
+    public void removeTask(String key, Task task) {
+        List<Task> tasks = tasksByKey.get(key);
         if (tasks != null) {
             tasks.remove(task);
             if (tasks.isEmpty()) {
-                tasksByDate.remove(date);
+                tasksByKey.remove(key);
             }
         }
     }
 
-    // Cập nhật công việc
-    public void updateTask(LocalDate date, int index, Task updatedTask) {
-        List<Task> tasks = tasksByDate.get(date);
+    // Cập nhật công việc với khóa kết hợp
+    public void updateTask(String key, int index, Task updatedTask) {
+        List<Task> tasks = tasksByKey.get(key);
         if (tasks != null && index >= 0 && index < tasks.size()) {
             tasks.set(index, updatedTask);
         }
+    }
+
+    public Map<String, List<Task>> getTasksByKey() {
+        return tasksByKey;
+    }
+
+    // Thêm phương thức để clear tất cả tasks (sử dụng cho "Reset All")
+    public void clearAllTasks() {
+        tasksByKey.clear();
     }
 }
