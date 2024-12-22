@@ -8,7 +8,7 @@ import com.toedter.calendar.JDateChooser;
 import java.awt.event.*;
 import java.util.Calendar;
 import java.util.Date;
-import java.text.SimpleDateFormat;
+// import java.text.SimpleDateFormat;
 
 public class CalendarGUI extends JFrame {
 
@@ -17,7 +17,7 @@ public class CalendarGUI extends JFrame {
     private JButton[] dayButtons = new JButton[42]; // Mảng lưu các button ngày
     private Calendar selectedDate = Calendar.getInstance(); // Lưu ngày được chọn
     private TaskManager taskManager; // Thêm TaskManager
-    private CalendarEventHandler eventHandler; // Thêm CalendarEventHandler
+    private JButton previouslySelectedButton = null; // Biến để lưu button đã được chọn trước đó
 
     public CalendarGUI() {
         // Khởi tạo TaskManager và tải dữ liệu từ tệp
@@ -224,20 +224,6 @@ public class CalendarGUI extends JFrame {
 
         // Cập nhật lịch ban đầu
         updateCalendar();
-
-        // Khởi tạo CalendarEventHandler
-        eventHandler = new CalendarEventHandler(dateChooser, centerPanelCenter, taskManager, "Daily");
-
-        // Cập nhật các sự kiện điều hướng tháng để sử dụng CalendarEventHandler
-        // Thay đổi phần thêm ActionListener cho các nút "Tháng trước" và "Tháng sau"
-
-        // Ví dụ:
-        // Tìm các nút "Tháng trước" và "Tháng sau" từ navPanel và gắn sự kiện
-        // Giả sử bạn đã lưu các nút này trong các biến btnPrevMonth và btnNextMonth
-
-        // Code mẫu:
-        // btnPrevMonth.addActionListener(e -> eventHandler.onPreviousMonthClicked());
-        // btnNextMonth.addActionListener(e -> eventHandler.onNextMonthClicked());
     }
 
     // Cập nhật lịch theo ngày trong JDateChooser
@@ -282,14 +268,22 @@ public class CalendarGUI extends JFrame {
                         year == selectedDate.get(Calendar.YEAR)) {
                     button.setBackground(new Color(255, 165, 0)); // Màu nền cho ngày được chọn (cam)
                     button.setForeground(Color.WHITE);
+
+                    // Reset màu nền của nút trước đó nếu có
+                    if (previouslySelectedButton != null && previouslySelectedButton != button) {
+                        previouslySelectedButton.setBackground(new Color(240, 240, 240));
+                        previouslySelectedButton.setForeground(Color.BLACK);
+                    }
+                    previouslySelectedButton = button;
                 }
 
                 // Thêm sự kiện click cho button ngày
                 int selectedDay = day;
                 button.addActionListener(e -> {
-                    Calendar selectedCalendar = Calendar.getInstance();
-                    selectedCalendar.set(year, month, selectedDay);
-                    openDailyPlan(selectedCalendar.getTime());
+                    selectedDate.set(Calendar.DAY_OF_MONTH, selectedDay);
+                    dateChooser.setDate(selectedDate.getTime());
+                    updateCalendar();
+                    openDailyPlan(selectedDate.getTime());
                 });
 
                 day++;
