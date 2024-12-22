@@ -19,13 +19,15 @@ public class CalendarEventHandler {
     private JButton[] dateButtons;
     private Calendar currentCalendar;
     private TaskManager taskManager; // Thêm TaskManager
+    private String currentTabTitle; // Thêm biến để lưu tên tab hiện tại
 
-    public CalendarEventHandler(JDateChooser dateChooser, JPanel centerPanelCenter, TaskManager taskManager) {
+    public CalendarEventHandler(JDateChooser dateChooser, JPanel centerPanelCenter, TaskManager taskManager, String currentTabTitle) {
         this.dateChooser = dateChooser;
         this.centerPanelCenter = centerPanelCenter;
         this.dateButtons = new JButton[42]; // 6 hàng x 7 cột = 42 ngày
         this.currentCalendar = Calendar.getInstance(); // Lấy ngày giờ hiện tại
         this.taskManager = taskManager; // Khởi tạo TaskManager
+        this.currentTabTitle = currentTabTitle; // Khởi tạo tabTitle
 
         // Khởi tạo các button ngày trong centerPanel_center
         initializeDateButtons();
@@ -145,7 +147,7 @@ public class CalendarEventHandler {
         centerPanelCenter.repaint();
     }
 
-    // Phương thức mới để mở DailyPlan với ngày được chọn
+    // Phương thức mới để mở DailyPlan với ngày được chọn và tabTitle hiện tại
     private void openDailyPlan(Date selectedDate) {
         SwingUtilities.invokeLater(() -> new DailyPlan(selectedDate, taskManager));
     }

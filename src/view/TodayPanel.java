@@ -10,18 +10,24 @@ import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 
 import static javax.swing.BorderFactory.*;
 
 public class TodayPanel extends JPanel {
 
+    private String tabTitle;
     private JDateChooser dateChooser;
     private TaskManager taskManager;
     private LocalDate localDate;
     private DefaultTableModel tableModel;
+    private Date selectedDate;
 
-    public TodayPanel(Date selectedDate, TaskManager taskManager) {
+    public TodayPanel(String tabTitle, Date selectedDate, TaskManager taskManager) {
+        this.tabTitle = tabTitle;
         this.taskManager = taskManager;
+        this.selectedDate = selectedDate;
         Calendar cal = Calendar.getInstance();
         cal.setTime(selectedDate);
         this.localDate = LocalDate.of(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
@@ -42,13 +48,24 @@ public class TodayPanel extends JPanel {
         JButton btnToday = new JButton("Today");
         JButton btnTomorrow = new JButton("Tomorrow");
         JButton btnAddTask = new JButton("Add task");
+        btnAddTask.addActionListener(e -> openAddTaskDialog());
 
         dateChooser = new JDateChooser();
         dateChooser.setPreferredSize(new Dimension(150, 35));
         dateChooser.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         dateChooser.setDateFormatString("dd/MM/yyyy");
         dateChooser.setToolTipText("Chọn ngày để lập lịch");
-        dateChooser.setDate(Calendar.getInstance().getTime()); 
+        dateChooser.setDate(selectedDate);
+        dateChooser.addPropertyChangeListener(evt -> {
+            if ("date".equals(evt.getPropertyName())) {
+                Calendar selectedCalendar = Calendar.getInstance();
+                selectedCalendar.setTime((Date) evt.getNewValue());
+                localDate = LocalDate.of(selectedCalendar.get(Calendar.YEAR),
+                                         selectedCalendar.get(Calendar.MONTH) + 1,
+                                         selectedCalendar.get(Calendar.DAY_OF_MONTH));
+                refreshTaskTable();
+            }
+        });
         topPanel_center.add(btnYesterday);
         topPanel_center.add(dateChooser);
         topPanel_center.add(btnTomorrow);
@@ -59,7 +76,7 @@ public class TodayPanel extends JPanel {
         // Task Table Panel
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new BorderLayout());
-        tablePanel.setBorder(createTitledBorder("List word"));
+        tablePanel.setBorder(createTitledBorder("List Task"));
 
         // Create Table Columns
         String[] columnNames = {"", "Task", "Start Time", "End Time", "Status", "Edit", "Delete"};
@@ -83,7 +100,8 @@ public class TodayPanel extends JPanel {
             }
         };
 
-        List<Task> tasks = taskManager.getTasksForDate(localDate);
+        String key = generateKey(tabTitle, localDate);
+        List<Task> tasks = taskManager.getTasksForKey(key);
         for (Task task : tasks) {
             tableModel.addRow(new Object[]{
                 false,
@@ -99,8 +117,8 @@ public class TodayPanel extends JPanel {
         JTable taskTable = new JTable(tableModel);
         taskTable.setRowHeight(30);
 
-        taskTable.getColumn("Edit").setCellEditor(new ButtonEditor(new JButton(), taskManager, localDate, tableModel));
-        taskTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JButton(), taskManager, localDate, tableModel));
+        taskTable.getColumn("Edit").setCellEditor(new ButtonEditor(new JButton(), taskManager, key, tableModel));
+        taskTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JButton(), taskManager, key, tableModel));
 
         taskTable.getColumn("Edit").setCellRenderer(new ButtonRenderer("Edit"));
         taskTable.getColumn("Delete").setCellRenderer(new ButtonRenderer("Delete"));
@@ -111,12 +129,13 @@ public class TodayPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(taskTable);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
 
-        JButton btnAddTaskTable = new JButton("Add Task");
-        btnAddTaskTable.addActionListener(e -> openAddTaskDialog());
-        add(btnAddTaskTable, BorderLayout.SOUTH);
+        // JButton btnAddTaskTable = new JButton("Add Task");
+        // btnAddTaskTable.addActionListener(e -> openAddTaskDialog());
+        // tablePanel.add(btnAddTaskTable, BorderLayout.SOUTH);
 
         add(tablePanel, BorderLayout.CENTER);
 
+        // Add Button Actions for navigation
         btnYesterday.addActionListener(e -> changeDateByOffset(-1));
         btnTomorrow.addActionListener(e -> changeDateByOffset(1));
         btnToday.addActionListener(e -> resetToToday());
@@ -149,7 +168,7 @@ public class TodayPanel extends JPanel {
             }
 
             Task newTask = new Task(name, startTime, endTime, status);
-            taskManager.addTask(localDate, newTask);
+            taskManager.addTask(generateKey(tabTitle, localDate), newTask);
             tableModel.addRow(new Object[]{
                 false,
                 name,
@@ -184,7 +203,8 @@ public class TodayPanel extends JPanel {
     // Làm mới bảng công việc
     private void refreshTaskTable() {
         tableModel.setRowCount(0); // Xóa tất cả row hiện tại
-        List<Task> tasks = taskManager.getTasksForDate(localDate);
+        String key = generateKey(tabTitle, localDate);
+        List<Task> tasks = taskManager.getTasksForKey(key);
         for (Task task : tasks) {
             tableModel.addRow(new Object[]{
                 false,
@@ -196,6 +216,11 @@ public class TodayPanel extends JPanel {
                 "Delete"
             });
         }
+    }
+
+    // Phương thức để tạo khóa kết hợp tabTitle và date
+    private String generateKey(String tabTitle, LocalDate date) {
+        return tabTitle + "_" + date.toString();
     }
 
     // Renderer for JButton in JTable (Custom Button Renderer)
@@ -217,14 +242,14 @@ public class TodayPanel extends JPanel {
         private JButton button;
         private String label;
         private TaskManager taskManager;
-        private LocalDate date;
+        private String key;
         private DefaultTableModel tableModel;
         private int row;
 
-        public ButtonEditor(JButton button, TaskManager taskManager, LocalDate date, DefaultTableModel tableModel) {
+        public ButtonEditor(JButton button, TaskManager taskManager, String key, DefaultTableModel tableModel) {
             this.button = button;
             this.taskManager = taskManager;
-            this.date = date;
+            this.key = key;
             this.tableModel = tableModel;
             this.button.addActionListener(new ActionListener() {
                 @Override
@@ -285,7 +310,11 @@ public class TodayPanel extends JPanel {
                 }
 
                 // Cập nhật Task trong TaskManager
-                List<Task> tasks = taskManager.getTasksForDate(date);
+                List<Task> tasks = taskManager.getTasksForKey(key);
+                if(row >= tasks.size()){
+                    JOptionPane.showMessageDialog(null, "Error: Task không tồn tại.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 Task task = tasks.get(row);
                 task.setName(name);
                 task.setStartTime(startTime);
@@ -306,9 +335,13 @@ public class TodayPanel extends JPanel {
             int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa công việc này không?", "Delete Task", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 // Xóa Task từ TaskManager
-                List<Task> tasks = taskManager.getTasksForDate(date);
+                List<Task> tasks = taskManager.getTasksForKey(key);
+                if(row >= tasks.size()){
+                    JOptionPane.showMessageDialog(null, "Error: Task không tồn tại.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 Task task = tasks.get(row);
-                taskManager.removeTask(date, task);
+                taskManager.removeTask(key, task);
 
                 // Xóa row khỏi Table Model
                 tableModel.removeRow(row);

@@ -8,6 +8,7 @@ import com.toedter.calendar.JDateChooser;
 import java.awt.event.*;
 import java.util.Calendar;
 import java.util.Date;
+import java.text.SimpleDateFormat;
 
 public class CalendarGUI extends JFrame {
 
@@ -16,7 +17,7 @@ public class CalendarGUI extends JFrame {
     private JButton[] dayButtons = new JButton[42]; // Mảng lưu các button ngày
     private Calendar selectedDate = Calendar.getInstance(); // Lưu ngày được chọn
     private TaskManager taskManager; // Thêm TaskManager
-    private DailyPlan dailyPlan; // Thêm DailyPlan
+    private CalendarEventHandler eventHandler; // Thêm CalendarEventHandler
 
     public CalendarGUI() {
         // Khởi tạo TaskManager và tải dữ liệu từ tệp
@@ -73,7 +74,7 @@ public class CalendarGUI extends JFrame {
         dateChooser.setDate(Calendar.getInstance().getTime()); // Hiển thị ngày hiện tại
         dateChooser.addPropertyChangeListener(evt -> {
             if ("date".equals(evt.getPropertyName())) {
-                selectedDate.setTime((java.util.Date) evt.getNewValue());
+                selectedDate.setTime((Date) evt.getNewValue());
                 updateCalendar();
             }
         });
@@ -186,7 +187,6 @@ public class CalendarGUI extends JFrame {
         navPanel.add(navPanelCenterWrapper, BorderLayout.CENTER);
         centerPanel.add(navPanel, BorderLayout.NORTH);
 
-
         // Tạo panel con bao quanh centerPanel_center để thu hẹp chiều rộng
         JPanel centerPanelWrapper = new JPanel();
         centerPanelWrapper.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
@@ -224,6 +224,20 @@ public class CalendarGUI extends JFrame {
 
         // Cập nhật lịch ban đầu
         updateCalendar();
+
+        // Khởi tạo CalendarEventHandler
+        eventHandler = new CalendarEventHandler(dateChooser, centerPanelCenter, taskManager, "Daily");
+
+        // Cập nhật các sự kiện điều hướng tháng để sử dụng CalendarEventHandler
+        // Thay đổi phần thêm ActionListener cho các nút "Tháng trước" và "Tháng sau"
+
+        // Ví dụ:
+        // Tìm các nút "Tháng trước" và "Tháng sau" từ navPanel và gắn sự kiện
+        // Giả sử bạn đã lưu các nút này trong các biến btnPrevMonth và btnNextMonth
+
+        // Code mẫu:
+        // btnPrevMonth.addActionListener(e -> eventHandler.onPreviousMonthClicked());
+        // btnNextMonth.addActionListener(e -> eventHandler.onNextMonthClicked());
     }
 
     // Cập nhật lịch theo ngày trong JDateChooser
@@ -312,7 +326,7 @@ public class CalendarGUI extends JFrame {
         updateCalendar();
     }
 
-    // Phương thức mở DailyPlan, truyền TaskManager
+    // Phương thức mở DailyPlan với ngày được chọn
     private void openDailyPlan(Date selectedDate) {
         SwingUtilities.invokeLater(() -> new DailyPlan(selectedDate, taskManager));
     }
