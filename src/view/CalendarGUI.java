@@ -1,3 +1,4 @@
+// src/view/CalendarGUI.java
 package view;
 
 import javax.swing.*;
@@ -6,6 +7,7 @@ import java.awt.*;
 import com.toedter.calendar.JDateChooser;
 import java.awt.event.*;
 import java.util.Calendar;
+import java.util.Date;
 
 public class CalendarGUI extends JFrame {
 
@@ -13,8 +15,13 @@ public class CalendarGUI extends JFrame {
     private JDateChooser dateChooser;
     private JButton[] dayButtons = new JButton[42]; // Mảng lưu các button ngày
     private Calendar selectedDate = Calendar.getInstance(); // Lưu ngày được chọn
+    private TaskManager taskManager; // Thêm TaskManager
+    private DailyPlan dailyPlan; // Thêm DailyPlan
 
     public CalendarGUI() {
+        // Khởi tạo TaskManager và tải dữ liệu từ tệp
+        taskManager = new TaskManager();
+        taskManager.loadFromFile("tasks_data.dat");
         // Set Look and Feel to "Nimbus" for better aesthetics
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -123,7 +130,7 @@ public class CalendarGUI extends JFrame {
         navPanel.setBackground(new Color(255, 255, 255));
 
         JPanel navPanelCenter = new JPanel();
-        navPanelCenter.setLayout(new GridLayout(1, 7, 10, 10));
+        navPanelCenter.setLayout(new GridLayout(1, 5, 10, 10)); // Điều chỉnh số cột
 
         String[] buttonLabels = {"Tháng trước", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật", "Tháng sau"};
         for (String label : buttonLabels) {
@@ -179,6 +186,7 @@ public class CalendarGUI extends JFrame {
         navPanel.add(navPanelCenterWrapper, BorderLayout.CENTER);
         centerPanel.add(navPanel, BorderLayout.NORTH);
 
+
         // Tạo panel con bao quanh centerPanel_center để thu hẹp chiều rộng
         JPanel centerPanelWrapper = new JPanel();
         centerPanelWrapper.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
@@ -204,6 +212,15 @@ public class CalendarGUI extends JFrame {
         setSize(1000, 600);
         setLocationRelativeTo(null); // Đặt cửa sổ giữa màn hình
         setVisible(true);
+
+        // Thiết lập đóng cửa sổ để lưu dữ liệu
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                taskManager.saveToFile("tasks_data.dat");
+                System.exit(0);
+            }
+        });
 
         // Cập nhật lịch ban đầu
         updateCalendar();
@@ -253,6 +270,14 @@ public class CalendarGUI extends JFrame {
                     button.setForeground(Color.WHITE);
                 }
 
+                // Thêm sự kiện click cho button ngày
+                int selectedDay = day;
+                button.addActionListener(e -> {
+                    Calendar selectedCalendar = Calendar.getInstance();
+                    selectedCalendar.set(year, month, selectedDay);
+                    openDailyPlan(selectedCalendar.getTime());
+                });
+
                 day++;
             } else {
                 button.setEnabled(false); // Disable các ngày không thuộc tháng hiện tại
@@ -285,6 +310,11 @@ public class CalendarGUI extends JFrame {
         calendar.add(Calendar.MONTH, 1);  // Tiến 1 tháng
         dateChooser.setDate(calendar.getTime());
         updateCalendar();
+    }
+
+    // Phương thức mở DailyPlan, truyền TaskManager
+    private void openDailyPlan(Date selectedDate) {
+        SwingUtilities.invokeLater(() -> new DailyPlan(selectedDate, taskManager));
     }
 
     public static void main(String[] args) {
