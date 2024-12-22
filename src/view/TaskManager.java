@@ -11,7 +11,9 @@ public class TaskManager implements Serializable {
     // Tải dữ liệu từ tệp
     public void loadFromFile(String filePath) {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            tasksByKey = (Map<String, List<Task>>) ois.readObject();
+            @SuppressWarnings("unchecked")
+            Map<String, List<Task>> loadedMap = (Map<String, List<Task>>) ois.readObject();
+            tasksByKey = loadedMap;
         } catch (Exception e) {
             tasksByKey = new HashMap<>(); // Nếu tệp không tồn tại hoặc lỗi
         }

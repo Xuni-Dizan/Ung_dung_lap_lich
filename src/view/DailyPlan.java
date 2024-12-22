@@ -66,6 +66,7 @@ public class DailyPlan extends JFrame {
 
         // Đọc danh sách tab và tiêu đề từ tệp
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("tabs_data.dat"))) {
+            @SuppressWarnings("unchecked")
             List<TabInfo> savedTabInfos = (List<TabInfo>) ois.readObject();
             for (TabInfo tabInfo : savedTabInfos) {
                 addTodayPanel(tabInfo.getTitle(), tabInfo.getSelectedDate());
@@ -157,12 +158,6 @@ public class DailyPlan extends JFrame {
         tabbedPane.addTab(tabTitle, newPanel); // Chỉ sử dụng tabTitle làm tiêu đề tab
     }
 
-    private void updateTabTitle(int tabIndex) {
-        // Bỏ qua việc thêm ngày tháng vào tiêu đề tab
-        TabInfo tabInfo = tabInfos.get(tabIndex);
-        tabbedPane.setTitleAt(tabIndex, tabInfo.getTitle());
-    }
-
     // Lưu danh sách TabInfo vào tệp
     private void saveTabsData() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("tabs_data.dat"))) {
@@ -170,11 +165,6 @@ public class DailyPlan extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private JPanel createTodayPanel(Date selectedDate) {
-        // Có thể giữ lại panel mặc định nếu cần
-        return new TodayPanel("Daily", selectedDate, taskManager);
     }
 
     // Khi đóng cửa sổ, lưu danh sách tab
