@@ -1,3 +1,4 @@
+// src/view/CalendarEventHandler.java
 package view;
 
 import com.toedter.calendar.JDateChooser;
@@ -6,8 +7,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class CalendarEventHandler {
 
@@ -15,12 +18,14 @@ public class CalendarEventHandler {
     private JPanel centerPanelCenter;
     private JButton[] dateButtons;
     private Calendar currentCalendar;
+    private TaskManager taskManager; // Thêm TaskManager
 
-    public CalendarEventHandler(JDateChooser dateChooser, JPanel centerPanelCenter) {
+    public CalendarEventHandler(JDateChooser dateChooser, JPanel centerPanelCenter, TaskManager taskManager) {
         this.dateChooser = dateChooser;
         this.centerPanelCenter = centerPanelCenter;
         this.dateButtons = new JButton[42]; // 6 hàng x 7 cột = 42 ngày
         this.currentCalendar = Calendar.getInstance(); // Lấy ngày giờ hiện tại
+        this.taskManager = taskManager; // Khởi tạo TaskManager
 
         // Khởi tạo các button ngày trong centerPanel_center
         initializeDateButtons();
@@ -33,7 +38,7 @@ public class CalendarEventHandler {
 
         // Lắng nghe sự thay đổi từ JDateChooser
         dateChooser.addPropertyChangeListener(e -> {
-            if (e.getPropertyName().equals("date")) {
+            if ("date".equals(e.getPropertyName())) {
                 updateCalendar(); // Cập nhật lại các button khi người dùng thay đổi ngày
             }
         });
@@ -72,37 +77,77 @@ public class CalendarEventHandler {
 
     // Cập nhật ngày tháng trong các button
     public void updateCalendar() {
-        Calendar calendar = (Calendar) currentCalendar.clone();
-        calendar.setTime(dateChooser.getDate()); // Lấy ngày từ JDateChooser
-
-        // Lấy tháng và năm hiện tại
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(dateChooser.getDate());
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
 
-        // Lấy ngày đầu tiên trong tháng và xác định thứ của ngày đầu tiên
-        calendar.set(year, month, 1);
-        int firstDayOfMonth = calendar.get(Calendar.DAY_OF_WEEK); // Thứ của ngày đầu tiên trong tháng
-        int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH); // Số ngày trong tháng
+        // Lấy ngày hiện tại để làm nổi bật
+        Calendar today = Calendar.getInstance();
+        int currentDay = today.get(Calendar.DAY_OF_MONTH);
+        int currentMonth = today.get(Calendar.MONTH);
+        int currentYear = today.get(Calendar.YEAR);
 
-        // Cập nhật các button với ngày trong tháng
-        for (int i = 0; i < 42; i++) {
-            JButton button = dateButtons[i];
-            if (i >= firstDayOfMonth - 1 && i < firstDayOfMonth - 1 + daysInMonth) {
-                int day = i - (firstDayOfMonth - 1) + 1;
+        // Cập nhật các ngày trong tháng vào các nút
+        centerPanelCenter.removeAll();
+        calendar.set(Calendar.DAY_OF_MONTH, 1);  // Đặt ngày đầu tháng
+        int firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+
+        // Thêm các button cho các ngày trong tháng
+        int day = 1;
+        for (int i = 0; i < 42; i++) { // 6 hàng * 7 cột = 42 button
+            JButton button = new JButton();
+            dateButtons[i] = button; // Lưu button vào mảng để dễ dàng truy xuất
+
+            if (i >= firstDayOfWeek - 1 && day <= calendar.getActualMaximum(Calendar.DAY_OF_MONTH)) {
                 button.setText(String.valueOf(day));
-                button.setEnabled(true); // Kích hoạt button ngày
-                button.setBackground(new Color(240, 240, 240)); // Màu nền sáng
 
-                // Đánh dấu ngày hiện tại
-                if (calendar.get(Calendar.DAY_OF_MONTH) == day) {
-                    button.setBackground(new Color(34, 193, 195)); // Màu nền ngày hiện tại
-                    button.setForeground(Color.WHITE); // Màu chữ trắng
+                // Nếu là ngày hiện tại, thay đổi màu nền của button
+                if (day == currentDay && currentMonth == month && currentYear == year) {
+                    button.setBackground(new Color(34, 193, 195)); // Màu xanh ngọc cho ngày hiện tại
+                    button.setForeground(Color.WHITE);
+                } else {
+                    button.setBackground(new Color(240, 240, 240)); // Màu nền nhạt cho các ngày khác
+                    button.setForeground(Color.BLACK);
                 }
+
+                // Nếu là ngày được chọn từ JDateChooser, thay đổi màu nền của button
+                LocalDate selectedLocalDate = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, day);
+                if (selectedLocalDate.equals(LocalDate.of(
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH) + 1,
+                        calendar.get(Calendar.DAY_OF_MONTH)))) {
+                    button.setBackground(new Color(255, 165, 0)); // Màu nền cho ngày được chọn (cam)
+                    button.setForeground(Color.WHITE);
+                }
+
+                // Thêm sự kiện click cho button ngày
+                int selectedDay = day;
+                button.addActionListener(e -> {
+                    Calendar selectedCalendar = Calendar.getInstance();
+                    selectedCalendar.set(year, month, selectedDay);
+                    openDailyPlan(selectedCalendar.getTime());
+                });
+
+                day++;
             } else {
-                button.setText(""); // Làm trống button ngoài tháng
-                button.setEnabled(false); // Không kích hoạt button ngoài tháng
+                button.setEnabled(false); // Disable các ngày không thuộc tháng hiện tại
             }
+
+            // Cài đặt font cho các nút ngày
+            button.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            button.setFocusPainted(false);
+            centerPanelCenter.add(button);
         }
+
+        // Làm mới giao diện
+        centerPanelCenter.revalidate();
+        centerPanelCenter.repaint();
+    }
+
+    // Phương thức mới để mở DailyPlan với ngày được chọn
+    private void openDailyPlan(Date selectedDate) {
+        SwingUtilities.invokeLater(() -> new DailyPlan(selectedDate, taskManager));
     }
 
     // Sự kiện cho nút "Tháng trước"
