@@ -9,6 +9,13 @@ import java.awt.event.*;
 import java.util.Calendar;
 import java.util.Date;
 // import java.text.SimpleDateFormat;
+import javax.swing.ImageIcon;
+import java.awt.Font;
+import java.io.File;
+import java.io.IOException;
+import java.awt.FontFormatException;
+import javax.swing.border.Border;
+import java.awt.geom.RoundRectangle2D;
 
 public class CalendarGUI extends JFrame {
 
@@ -18,8 +25,25 @@ public class CalendarGUI extends JFrame {
     private Calendar selectedDate = Calendar.getInstance(); // Lưu ngày được chọn
     private TaskManager taskManager; // Thêm TaskManager
     private JButton previouslySelectedButton = null; // Biến để lưu button đã được chọn trước đó
+    private Font robotoFont;
+    private boolean isDarkMode = false;
+
+    // Định nghĩa bảng màu đồng bộ
+    private static final Color PRIMARY_COLOR = new Color(34, 193, 195); // Xanh ngọc
+    private static final Color PRIMARY_HOVER_COLOR = new Color(45, 192, 194);
+    private static final Color ACCENT_COLOR = new Color(255, 165, 0); // Cam nhạt
+    private static final Color BACKGROUND_COLOR = new Color(245, 245, 245); // Xám nhạt cho Light Mode
+    private static final Color BUTTON_TEXT_COLOR = Color.WHITE;
 
     public CalendarGUI() {
+        try {
+            robotoFont = Font.createFont(Font.TRUETYPE_FONT, new File("resources/fonts/Roboto-Regular.ttf")).deriveFont(14f);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(robotoFont);
+        } catch (IOException | FontFormatException e) {
+            e.printStackTrace();
+            robotoFont = new Font("Segoe UI", Font.PLAIN, 14);
+        }
         // Khởi tạo TaskManager và tải dữ liệu từ tệp
         taskManager = new TaskManager();
         taskManager.loadFromFile("tasks_data.dat");
@@ -38,14 +62,18 @@ public class CalendarGUI extends JFrame {
         // Tạo tiêu đề cho JFrame
         setTitle("Lịch của tôi");
 
+        // Thiết lập Gradient toàn cục
+        GradientBackgroundPanel gradientPanel = new GradientBackgroundPanel(new Color(173, 216, 230), new Color(25, 25, 112)); // Từ Baby Blue tới Navy Blue
+        setContentPane(gradientPanel);
+
         // Thiết lập layout chính
         setLayout(new BorderLayout(10, 10));
         getRootPane().setBorder(new EmptyBorder(15, 15, 15, 15)); // Tăng khoảng cách xung quanh
 
         // Panel chứa các thành phần ở trên (Notify, DateTimePicker)
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 25, 15));
-        topPanel.setBackground(new Color(245, 245, 245)); // Màu nền nhẹ nhàng
+        JPanel topPanel = new GradientPanel(new Color(34, 193, 195), new Color(25, 25, 112));
+        topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 20)); // Tăng khoảng cách giữa các component
+        topPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Khoảng cách xung quanh
 
         // Checkbox Notify
         JCheckBox notifyCheckBox = new JCheckBox("Thông báo");
@@ -80,27 +108,21 @@ public class CalendarGUI extends JFrame {
         });
         topPanel.add(dateChooser);
 
-        // Button "Hôm nay"
-        JButton todayButton = new JButton("Hôm nay");
-        todayButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        todayButton.setBackground(new Color(34, 193, 195)); // Màu xanh ngọc tươi sáng
-        todayButton.setForeground(Color.WHITE);
-        todayButton.setFocusPainted(false);
-        todayButton.setBorder(BorderFactory.createEmptyBorder()); // Không viền cứng
-        todayButton.setToolTipText("Chuyển đến ngày hôm nay");
-        todayButton.setPreferredSize(new Dimension(110, 40));
-        todayButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Thêm hiệu ứng chuột
-
-        // Thêm hiệu ứng hover cho nút "Hôm nay"
+        // Button "Hôm nay" với icon và bo góc mềm mại
+        JButton todayButton = createRoundedButton("Hôm nay", PRIMARY_COLOR, BUTTON_TEXT_COLOR);
+        todayButton.setPreferredSize(new Dimension(140, 50)); // Tăng kích thước button
         todayButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                todayButton.setBackground(new Color(45, 192, 194));
-                todayButton.setBorder(BorderFactory.createLineBorder(new Color(45, 192, 194), 3)); // Thêm border nhẹ khi hover
+                todayButton.setBackground(PRIMARY_HOVER_COLOR);
+                todayButton.setBorder(BorderFactory.createCompoundBorder(
+                    new RoundedBorder(15),
+                    BorderFactory.createLineBorder(new Color(100, 150, 200), 2)
+                ));
             }
 
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                todayButton.setBackground(new Color(34, 193, 195));
-                todayButton.setBorder(BorderFactory.createEmptyBorder()); // Remove border
+                todayButton.setBackground(PRIMARY_COLOR);
+                todayButton.setBorder(BorderFactory.createEmptyBorder());
             }
         });
 
@@ -194,8 +216,8 @@ public class CalendarGUI extends JFrame {
 
         // Panel chứa ma trận button với 6 hàng và 7 cột
         centerPanelCenter = new JPanel();
-        centerPanelCenter.setLayout(new GridLayout(6, 7, 10, 10));
-        centerPanelCenter.setPreferredSize(new Dimension(695, 300));
+        centerPanelCenter.setLayout(new GridLayout(6, 7, 15, 15)); // Tăng khoảng cách từ 10 lên 15
+        centerPanelCenter.setPreferredSize(new Dimension(700, 350));
         centerPanelCenter.setBackground(new Color(255, 255, 255));
 
         // Thêm các button vào centerPanelCenter (Các ngày của tháng)
@@ -327,5 +349,156 @@ public class CalendarGUI extends JFrame {
 
     public static void main(String[] args) {
         new CalendarGUI();
+    }
+
+    // Lớp JPanel hỗ trợ Gradient
+    class GradientPanel extends JPanel {
+        private Color startColor;
+        private Color endColor;
+
+        public GradientPanel(Color start, Color end) {
+            this.startColor = start;
+            this.endColor = end;
+            setOpaque(false);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g;
+            int width = getWidth();
+            int height = getHeight();
+            GradientPaint gp = new GradientPaint(0, 0, startColor, 0, height, endColor);
+            g2d.setPaint(gp);
+            g2d.fillRect(0, 0, width, height);
+        }
+    }
+
+    // Phương thức tạo JButton với bo tròn góc và hệ màu đồng bộ
+    private JButton createRoundedButton(String text, Color bgColor, Color fgColor) {
+        JButton button = new JButton(text);
+        button.setFocusPainted(false);
+        button.setBackground(bgColor);
+        button.setForeground(fgColor);
+        button.setBorder(new RoundedBorder(15)); // Bo góc 15px
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        button.setPreferredSize(new Dimension(110, 40));
+        
+        // Bo tròn góc bằng cách sử dụng Border
+        button.setBorder(BorderFactory.createCompoundBorder(
+            new RoundedBorder(15), // Bo góc 15px
+            BorderFactory.createEmptyBorder(5, 15, 5, 15) // Khoảng cách nội dung
+        ));
+        
+        return button;
+    }
+
+    // Phương thức tạo JButton với icon và bo tròn góc
+    private JButton createRoundedButtonWithIcon(String text, Color bgColor, Color fgColor, String iconPath) {
+        JButton button = new JButton(text, new ImageIcon(iconPath));
+        button.setFocusPainted(false);
+        button.setBackground(bgColor);
+        button.setForeground(fgColor);
+        button.setHorizontalTextPosition(SwingConstants.RIGHT);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        button.setPreferredSize(new Dimension(140, 40));
+        
+        // Bo tròn góc
+        button.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(bgColor, 2),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+        
+        return button;
+    }
+
+    // Phương thức chuyển đổi giữa Light Mode và Dark Mode
+    private void toggleDarkMode() {
+        isDarkMode = !isDarkMode;
+        if (isDarkMode) {
+            setDarkTheme();
+        } else {
+            setLightTheme();
+        }
+        SwingUtilities.updateComponentTreeUI(this);
+    }
+
+    private void setDarkTheme() {
+        // Đổi màu nền cho frame
+        getContentPane().setBackground(new Color(45, 45, 45));
+
+        // Đổi màu cho các panel và button
+        // Ví dụ cho topPanel
+        // Giả sử topPanel là GradientPanel
+        // Bạn có thể cần thêm phương thức để cập nhật màu cho GradientPanel
+        // Tương tự cho các component khác
+
+        // Đổi màu cho JTable
+        // ... (Áp dụng các thay đổi màu sắc tương tự cho các component)
+    }
+
+    private void setLightTheme() {
+        // Đổi lại màu nền cho frame
+        getContentPane().setBackground(Color.WHITE);
+
+        // Đổi màu cho các panel và button về màu ban đầu
+        // Ví dụ cho topPanel
+        // Giả sử topPanel là GradientPanel
+        // Cập nhật lại màu sắc cho GradientPanel
+        // Tương tự cho các component khác
+
+        // Đổi màu cho JTable
+        // ... (Áp dụng các thay đổi màu sắc tương tự cho các component)
+    }
+
+    // Lớp RoundedBorder để sử dụng cho các component có bo góc
+    class RoundedBorder implements Border {
+        private int radius;
+
+        RoundedBorder(int radius) {
+            this.radius = radius;
+        }
+
+        @Override
+        public Insets getBorderInsets(Component c) {
+            return new Insets(this.radius+1, this.radius+1, this.radius+2, this.radius);
+        }
+
+        @Override
+        public boolean isBorderOpaque() {
+            return false;
+        }
+
+        @Override
+        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setColor(Color.GRAY);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.draw(new RoundRectangle2D.Float(x, y, width-1, height-1, radius, radius));
+        }
+    }
+
+    // Mở rộng GradientPanel để áp dụng cho toàn bộ nền
+    class GradientBackgroundPanel extends JPanel {
+        private Color startColor;
+        private Color endColor;
+
+        public GradientBackgroundPanel(Color start, Color end) {
+            this.startColor = start;
+            this.endColor = end;
+            setLayout(new BorderLayout());
+            setOpaque(false);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g;
+            int width = getWidth();
+            int height = getHeight();
+            GradientPaint gp = new GradientPaint(0, 0, startColor, 0, height, endColor);
+            g2d.setPaint(gp);
+            g2d.fillRect(0, 0, width, height);
+        }
     }
 }
