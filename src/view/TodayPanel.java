@@ -31,6 +31,7 @@ public class TodayPanel extends JPanel {
     private DefaultTableModel tableModel;
     private Date selectedDate;
     private boolean isDarkMode = false; // Biến để kiểm soát chế độ Dark Mode
+    private JComboBox<String> statusComboBox;
 
     public TodayPanel(String tabTitle, Date selectedDate, TaskManager taskManager) {
         this.tabTitle = tabTitle;
@@ -57,10 +58,10 @@ public class TodayPanel extends JPanel {
         topPanel.add(topPanel_right, BorderLayout.EAST);
         topPanel.add(topPanel_left, BorderLayout.WEST);
 
-        JButton btnYesterday = createRoundedButton("Yesterday", new Color(70, 130, 180), Color.WHITE);
-        JButton btnToday = createRoundedButton("Today", new Color(70, 130, 180), Color.WHITE);
-        JButton btnTomorrow = createRoundedButton("Tomorrow", new Color(70, 130, 180), Color.WHITE);
-        JButton btnAddTask = createRoundedButton("Add Task", new Color(39, 174, 96), Color.WHITE);
+        JButton btnYesterday = createRoundedButton("Hôm qua", new Color(70, 130, 180), Color.WHITE);
+        JButton btnToday = createRoundedButton("Hôm nay", new Color(70, 130, 180), Color.WHITE);
+        JButton btnTomorrow = createRoundedButton("Ngày mai", new Color(70, 130, 180), Color.WHITE);
+        JButton btnAddTask = createRoundedButton("Thêm công việc", new Color(39, 174, 96), Color.WHITE);
 
         btnAddTask.addActionListener(e -> openAddTaskDialog());
 
@@ -68,7 +69,7 @@ public class TodayPanel extends JPanel {
         dateChooser.setPreferredSize(new Dimension(150, 35));
         dateChooser.setFont(new Font("Roboto", Font.PLAIN, 16));
         dateChooser.setDateFormatString("dd/MM/yyyy");
-        dateChooser.setToolTipText("Select Date to Plan");
+        dateChooser.setToolTipText("Chọn ngày để lập lịch");
         dateChooser.setDate(selectedDate);
         styleDateChooser(dateChooser);
         dateChooser.addPropertyChangeListener(evt -> {
@@ -97,11 +98,11 @@ public class TodayPanel extends JPanel {
         // Áp dụng DropShadowBorder cho tablePanel
         tablePanel.setBorder(BorderFactory.createCompoundBorder(
             new DropShadowBorder(5, new Color(0, 0, 0, 50)),
-            createTitledBorder("List Task")
+            createTitledBorder("Danh sách công việc")
         ));
 
         // Create Table Columns
-        String[] columnNames = {"Completed", "Task", "Start Time", "End Time", "Status", "Edit", "Delete"};
+        String[] columnNames = {"Hoàn thành", "Công việc", "Thời gian bắt đầu", "Thời gian kết thúc", "Trạng thái", "Chỉnh sửa", "Xóa"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
@@ -133,8 +134,8 @@ public class TodayPanel extends JPanel {
                 task.getStartTime(),
                 task.getEndTime(),
                 task.getStatus(),
-                "Edit",
-                "Delete"
+                "Chỉnh sửa",
+                "Xóa"
             });
         }
 
@@ -145,14 +146,14 @@ public class TodayPanel extends JPanel {
         taskTable.setDefaultRenderer(String.class, new StatusRenderer());
 
         // Sử dụng các Renderer riêng cho "Edit" và "Delete"
-        taskTable.getColumn("Edit").setCellRenderer(new ButtonRenderer("Edit"));
-        taskTable.getColumn("Delete").setCellRenderer(new ButtonRenderer("Delete"));
+        taskTable.getColumn("Chỉnh sửa").setCellRenderer(new ButtonRenderer("Chỉnh sửa"));
+        taskTable.getColumn("Xóa").setCellRenderer(new ButtonRenderer("Xóa"));
 
         // Sử dụng các Editor riêng cho "Edit" và "Delete"
-        taskTable.getColumn("Edit").setCellEditor(new EditButtonEditor());
-        taskTable.getColumn("Delete").setCellEditor(new DeleteButtonEditor());
+        taskTable.getColumn("Chỉnh sửa").setCellEditor(new EditButtonEditor());
+        taskTable.getColumn("Xóa").setCellEditor(new DeleteButtonEditor());
 
-        JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Hoàn thành", "Đang tiến hành", "Chưa bắt đầu", "Quá hạn"});
+        statusComboBox = new JComboBox<>(new String[]{"Hoàn thành", "Đang tiến hành", "Chưa bắt đầu", "Quá hạn"});
         taskTable.getColumnModel().getColumn(4).setCellEditor(new DefaultCellEditor(statusComboBox));
 
         JScrollPane scrollPane = new JScrollPane(taskTable);
@@ -293,46 +294,77 @@ public class TodayPanel extends JPanel {
      * @return            Thông điệp lỗi nếu có, ngược lại trả về chuỗi rỗng
      */
     private String validateTaskInput(String name, String startTime, String endTime, String key, int currentRow) {
-        StringBuilder error = new StringBuilder();
+    StringBuilder error = new StringBuilder();
 
-        // Kiểm tra tên công việc không được trống
-        if (name.isEmpty()) {
-            error.append("- Tên công việc không được để trống.\n");
-        }
+    // Kiểm tra tên công việc không được trống
+    if (name.isEmpty()) {
+        error.append("- Tên công việc không được để trống.\n");
+    }
 
-        // Kiểm tra định dạng thời gian (HH:mm)
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-        sdf.setLenient(false);
-        Date startDate = null;
-        Date endDate = null;
-        try {
-            startDate = sdf.parse(startTime);
-        } catch (ParseException e) {
-            error.append("- Thời gian bắt đầu không hợp lệ. Vui lòng nhập theo định dạng HH:mm.\n");
-        }
+    // Kiểm tra tên công việc không trùng lặp
+    if (taskManager.isTaskNameDuplicate(key, name, currentRow)) {
+        error.append("- Tên công việc đã tồn tại. Vui lòng chọn tên khác.\n");
+    }
 
-        try {
-            endDate = sdf.parse(endTime);
-        } catch (ParseException e) {
-            error.append("- Thời gian kết thúc không hợp lệ. Vui lòng nhập theo định dạng HH:mm.\n");
-        }
+    // Kiểm tra định dạng thời gian (HH:mm)
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+    sdf.setLenient(false);
+    Date startDate = null;
+    Date endDate = null;
+    try {
+        startDate = sdf.parse(startTime);
+    } catch (ParseException e) {
+        error.append("- Thời gian bắt đầu không hợp lệ. Vui lòng nhập theo định dạng HH:mm.\n");
+    }
 
-        // Kiểm tra thời gian bắt đầu nhỏ hơn thời gian kết thúc
-        if (startDate != null && endDate != null && !startDate.before(endDate)) {
-            error.append("- Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc.\n");
-        }
+    try {
+        endDate = sdf.parse(endTime);
+    } catch (ParseException e) {
+        error.append("- Thời gian kết thúc không hợp lệ. Vui lòng nhập theo định dạng HH:mm.\n");
+    }
 
-        // Kiểm tra tên công việc không trùng lặp
+    // Kiểm tra thời gian bắt đầu nhỏ hơn thời gian kết thúc
+    if (startDate != null && endDate != null && !startDate.before(endDate)) {
+        error.append("- Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc.\n");
+    }
+
+    // Kiểm tra khoảng thời gian có chồng chéo với các công việc khác không
+    if (startDate != null && endDate != null) {
         List<Task> tasks = taskManager.getTasksForKey(key);
         for (int i = 0; i < tasks.size(); i++) {
             if (i == currentRow) continue; // Bỏ qua công việc hiện tại khi chỉnh sửa
-            if (tasks.get(i).getName().equalsIgnoreCase(name)) {
-                error.append("- Tên công việc đã tồn tại. Vui lòng chọn tên khác.\n");
-                break;
+            Task existingTask = tasks.get(i);
+            try {
+                Date existingStart = sdf.parse(existingTask.getStartTime());
+                Date existingEnd = sdf.parse(existingTask.getEndTime());
+                if (startDate.before(existingEnd) && endDate.after(existingStart)) {
+                    error.append("- Thời gian của công việc này chồng chéo với công việc \"").append(existingTask.getName()).append("\".\n");
+                    break;
+                }
+            } catch (ParseException e) {
+                // Nếu có lỗi trong công việc hiện tại, bỏ qua kiểm tra chồng chéo
+                continue;
             }
         }
+    }
 
-        return error.toString();
+    // Kiểm tra tính hợp lệ của trạng thái công việc
+    if (!isValidStatus(taskManager.getValidStatuses(), (String) statusComboBox.getSelectedItem())) {
+        error.append("- Trạng thái công việc không hợp lệ.\n");
+    }
+
+    return error.toString();
+}
+
+    /**
+     * Phương thức kiểm tra trạng thái công việc có hợp lệ không
+     *
+     * @param validStatuses Danh sách các trạng thái hợp lệ
+     * @param status        Trạng thái cần kiểm tra
+     * @return              true nếu hợp lệ, false nếu không
+     */
+    private boolean isValidStatus(List<String> validStatuses, String status) {
+        return validStatuses.contains(status);
     }
 
     // Thay đổi ngày dựa trên offset (trước hoặc sau)
@@ -365,8 +397,8 @@ public class TodayPanel extends JPanel {
                 task.getStartTime(),
                 task.getEndTime(),
                 task.getStatus(),
-                "Edit",
-                "Delete"
+                "Chỉnh sửa",
+                "Xóa"
             });
         }
     }

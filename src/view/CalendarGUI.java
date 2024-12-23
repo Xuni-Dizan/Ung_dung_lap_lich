@@ -61,7 +61,7 @@ public class CalendarGUI extends JFrame {
         }
 
         // Tạo tiêu đề cho JFrame
-        setTitle("Lịch của tôi");
+        setTitle("Ứng dụng lập lịch công việc");
 
         // Thiết lập Gradient toàn cục
         GradientBackgroundPanel gradientPanel = new GradientBackgroundPanel(new Color(173, 216, 230), new Color(216, 191, 216)); // Baby Blue sang Light Lavender
@@ -77,7 +77,7 @@ public class CalendarGUI extends JFrame {
         topPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Khoảng cách xung quanh
 
         // Checkbox Notify
-        JCheckBox notifyCheckBox = new JCheckBox("Thông báo");
+        JCheckBox notifyCheckBox = new JCheckBox("Nhận thông báo");
         notifyCheckBox.setFont(new Font("Roboto", Font.PLAIN, 16));
         notifyCheckBox.setForeground(isDarkMode ? Color.WHITE : new Color(60, 60, 60));
         notifyCheckBox.setBackground(isDarkMode ? BACKGROUND_COLOR_DARK : BACKGROUND_COLOR_LIGHT);
@@ -101,7 +101,7 @@ public class CalendarGUI extends JFrame {
         dateChooser.setPreferredSize(new Dimension(150, 35));
         dateChooser.setFont(new Font("Roboto", Font.PLAIN, 16));
         dateChooser.setDateFormatString("dd/MM/yyyy");
-        dateChooser.setToolTipText("Chọn ngày để lập lịch");
+        dateChooser.setToolTipText("Chọn ngày để tạo lịch");
         dateChooser.setDate(Calendar.getInstance().getTime());
         dateChooser.addPropertyChangeListener(evt -> {
             if ("date".equals(evt.getPropertyName())) {
@@ -156,7 +156,7 @@ public class CalendarGUI extends JFrame {
         navPanelCenter.setLayout(new GridLayout(1, 9, 10, 10)); // Điều chỉnh số cột
         navPanelCenter.setBackground(isDarkMode ? BACKGROUND_COLOR_DARK : BACKGROUND_COLOR_LIGHT);
 
-        String[] buttonLabels = {"Previous Month", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Sunday", "Next Month"};
+        String[] buttonLabels = {"Tháng trước", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "CN", "Tháng sau"};
         for (String label : buttonLabels) {
             JButton button = new JButton(label);
             button.setFont(new Font("Roboto", Font.BOLD, 12));
@@ -168,7 +168,7 @@ public class CalendarGUI extends JFrame {
             button.setOpaque(true);
             
             // Tăng kích thước nút để chứa toàn bộ văn bản
-            if (label.equals("Previous Month") || label.equals("Next Month")) {
+            if (label.equals("Tháng trước") || label.equals("Tháng sau")) {
                 button.setPreferredSize(new Dimension(120, 40)); // Tăng chiều rộng từ 100 đến 120
                 button.setFont(new Font("Roboto", Font.BOLD, 12)); // Giữ kích thước phông chữ hiện tại hoặc giảm nếu cần
             } else {
@@ -192,7 +192,7 @@ public class CalendarGUI extends JFrame {
                 }
             });
 
-            if (label.equals("Previous Month")) {
+            if (label.equals("Tháng trước")) {
                 navPanel.add(button, BorderLayout.WEST);
                 button.setPreferredSize(new Dimension(120, 40)); // Tăng kích thước
                 button.addActionListener(new ActionListener() {
@@ -201,7 +201,7 @@ public class CalendarGUI extends JFrame {
                         moveToPreviousMonth();
                     }
                 });
-            } else if (label.equals("Next Month")) {
+            } else if (label.equals("Tháng sau")) {
                 navPanel.add(button, BorderLayout.EAST);
                 button.setPreferredSize(new Dimension(120, 40)); // Tăng kích thước
                 button.addActionListener(new ActionListener() {

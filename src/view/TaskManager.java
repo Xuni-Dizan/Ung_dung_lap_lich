@@ -86,4 +86,13 @@ public class TaskManager implements Serializable {
         }
         return false;
     }
+
+    /**
+     * Lấy danh sách các trạng thái hợp lệ cho công việc
+     *
+     * @return Danh sách các trạng thái hợp lệ
+     */
+    public List<String> getValidStatuses() {
+        return Arrays.asList("Hoàn thành", "Đang tiến hành", "Chưa bắt đầu", "Quá hạn");
+    }
 }
