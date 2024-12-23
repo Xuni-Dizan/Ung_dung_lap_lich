@@ -5,7 +5,11 @@ public class Main {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new CalendarGUI();  // Tạo và hiển thị cửa sổ CalendarGUI
+                try {
+                    new CalendarGUI();  // Tạo và hiển thị cửa sổ CalendarGUI
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

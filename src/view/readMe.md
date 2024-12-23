@@ -196,7 +196,6 @@ Nếu bạn có bất kỳ câu hỏi hoặc đóng góp nào, vui lòng liên h
 
 - **Email**: xunidizan@gmail.com
 - **GitHub**: [https://github.com/Xuni-Dizan/Ung_dung_lap_lich](https://github.com/your-repo/calendar-app)
-- **Telegram**: [@your_telegram](https://t.me/your_telegram)
 
 ---
 

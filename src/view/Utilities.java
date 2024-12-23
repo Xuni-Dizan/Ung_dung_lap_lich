@@ -7,7 +7,7 @@ import java.awt.*;
 public class Utilities {
 
     /**
-     * Áp dụng màu sắc cho JButton dựa trên chế độ Dark Mode.
+     * Áp dụng màu sắc và kích thước cho JButton dựa trên chế độ Dark Mode.
      *
      * @param button      JButton cần áp dụng màu sắc.
      * @param isDarkMode  Trạng thái Dark Mode (true: Dark Mode, false: Light Mode).
@@ -24,7 +24,16 @@ public class Utilities {
         }
 
         // Áp dụng font nếu cần thiết
-        button.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        button.setFont(new Font("Roboto", Font.PLAIN, 14));
+
+        // Bo góc
+        button.setBorder(BorderFactory.createCompoundBorder(
+            new RoundedBorder(10),
+            BorderFactory.createEmptyBorder(5, 15, 5, 15)
+        ));
+        
+        // Tăng kích thước nút nếu cần
+        button.setPreferredSize(new Dimension(120, 40)); // Thay đổi kích thước theo nhu cầu
     }
 
     /**
@@ -41,7 +50,7 @@ public class Utilities {
         }
 
         // Áp dụng font nếu cần thiết
-        label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        label.setFont(new Font("Roboto", Font.PLAIN, 14));
     }
 
     /**
@@ -61,7 +70,7 @@ public class Utilities {
             JTableHeader header = table.getTableHeader();
             header.setBackground(new Color(45, 45, 45));
             header.setForeground(Color.WHITE);
-            header.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            header.setFont(new Font("Roboto", Font.BOLD, 14));
             header.setOpaque(false);
         } else {
             table.setBackground(Color.WHITE);
@@ -73,12 +82,12 @@ public class Utilities {
             JTableHeader header = table.getTableHeader();
             header.setBackground(new Color(220, 220, 220));
             header.setForeground(Color.BLACK);
-            header.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            header.setFont(new Font("Roboto", Font.BOLD, 14));
             header.setOpaque(false);
         }
 
         // Áp dụng font và chỉnh sửa các thuộc tính khác nếu cần
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        table.setFont(new Font("Roboto", Font.PLAIN, 14));
         table.getTableHeader().setReorderingAllowed(false);
     }
 
@@ -94,7 +103,14 @@ public class Utilities {
         } else {
             panel.setBackground(Color.WHITE);
         }
+
+        // Áp dụng bo góc
+        panel.setBorder(BorderFactory.createCompoundBorder(
+            new RoundedBorder(15),
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
     }
 
-    // Các phương thức tiện ích khác có thể được thêm vào đây.
+    // Các phương thức tiện ích khác...
+
 }
