@@ -19,6 +19,9 @@ import java.awt.geom.RoundRectangle2D;
 
 import static javax.swing.BorderFactory.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 public class TodayPanel extends JPanel {
 
     private String tabTitle;
@@ -188,24 +191,27 @@ public class TodayPanel extends JPanel {
         JTextField startTimeField = new JTextField(task.getStartTime());
         JTextField endTimeField = new JTextField(task.getEndTime());
         JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Hoàn thành", "Đang tiến hành", "Chưa bắt đầu", "Quá hạn"});
+
         statusComboBox.setSelectedItem(task.getStatus());
 
         Object[] message = {
-            "Task Name:", taskNameField,
-            "Start Time:", startTimeField,
-            "End Time:", endTimeField,
-            "Status:", statusComboBox
+            "Tên công việc:", taskNameField,
+            "Thời gian bắt đầu (HH:mm):", startTimeField,
+            "Thời gian kết thúc (HH:mm):", endTimeField,
+            "Trạng thái:", statusComboBox
         };
 
-        int option = JOptionPane.showConfirmDialog(this, message, "Edit Task", JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(this, message, "Chỉnh sửa Công việc", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             String name = taskNameField.getText().trim();
             String startTime = startTimeField.getText().trim();
             String endTime = endTimeField.getText().trim();
             String status = (String) statusComboBox.getSelectedItem();
 
-            if (name.isEmpty() || startTime.isEmpty() || endTime.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin công việc.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            // Kiểm tra dữ liệu đầu vào
+            String errorMessage = validateTaskInput(name, startTime, endTime, key, row);
+            if (!errorMessage.isEmpty()) {
+                JOptionPane.showMessageDialog(this, errorMessage, "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -225,10 +231,13 @@ public class TodayPanel extends JPanel {
             tableModel.setValueAt(endTime, row, 3);
             tableModel.setValueAt(status, row, 4);
 
-            JOptionPane.showMessageDialog(this, "Công việc đã được cập nhật thành công.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Công việc đã được cập nhật thành công.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
+    /**
+     * Phương thức mở dialog để thêm công việc mới
+     */
     private void openAddTaskDialog() {
         JTextField taskNameField = new JTextField();
         JTextField startTimeField = new JTextField();
@@ -236,21 +245,23 @@ public class TodayPanel extends JPanel {
         JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Hoàn thành", "Đang tiến hành", "Chưa bắt đầu", "Quá hạn"});
 
         Object[] message = {
-            "Task Name:", taskNameField,
-            "Start Time:", startTimeField,
-            "End Time:", endTimeField,
-            "Status:", statusComboBox
+            "Tên công việc:", taskNameField,
+            "Thời gian bắt đầu (HH:mm):", startTimeField,
+            "Thời gian kết thúc (HH:mm):", endTimeField,
+            "Trạng thái:", statusComboBox
         };
 
-        int option = JOptionPane.showConfirmDialog(this, message, "Add New Task", JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(this, message, "Thêm Công việc Mới", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
             String name = taskNameField.getText().trim();
             String startTime = startTimeField.getText().trim();
             String endTime = endTimeField.getText().trim();
             String status = (String) statusComboBox.getSelectedItem();
 
-            if (name.isEmpty() || startTime.isEmpty() || endTime.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin công việc.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            // Kiểm tra dữ liệu đầu vào
+            String errorMessage = validateTaskInput(name, startTime, endTime, generateKey(tabTitle, localDate), -1);
+            if (!errorMessage.isEmpty()) {
+                JOptionPane.showMessageDialog(this, errorMessage, "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -262,11 +273,66 @@ public class TodayPanel extends JPanel {
                 startTime,
                 endTime,
                 status,
-                "Edit",
-                "Delete"
+                "Chỉnh sửa",
+                "Xóa"
             });
             taskManager.saveToFile("tasks_data.dat"); // Lưu ngay
+
+            JOptionPane.showMessageDialog(this, "Đã thêm công việc thành công.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
         }
+    }
+
+    /**
+     * Phương thức kiểm tra dữ liệu đầu vào của công việc
+     * 
+     * @param name        Tên công việc
+     * @param startTime   Thời gian bắt đầu
+     * @param endTime     Thời gian kết thúc
+     * @param key         Khóa để kiểm tra trùng lặp
+     * @param currentRow  Hàng hiện tại (để bỏ qua khi chỉnh sửa)
+     * @return            Thông điệp lỗi nếu có, ngược lại trả về chuỗi rỗng
+     */
+    private String validateTaskInput(String name, String startTime, String endTime, String key, int currentRow) {
+        StringBuilder error = new StringBuilder();
+
+        // Kiểm tra tên công việc không được trống
+        if (name.isEmpty()) {
+            error.append("- Tên công việc không được để trống.\n");
+        }
+
+        // Kiểm tra định dạng thời gian (HH:mm)
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        sdf.setLenient(false);
+        Date startDate = null;
+        Date endDate = null;
+        try {
+            startDate = sdf.parse(startTime);
+        } catch (ParseException e) {
+            error.append("- Thời gian bắt đầu không hợp lệ. Vui lòng nhập theo định dạng HH:mm.\n");
+        }
+
+        try {
+            endDate = sdf.parse(endTime);
+        } catch (ParseException e) {
+            error.append("- Thời gian kết thúc không hợp lệ. Vui lòng nhập theo định dạng HH:mm.\n");
+        }
+
+        // Kiểm tra thời gian bắt đầu nhỏ hơn thời gian kết thúc
+        if (startDate != null && endDate != null && !startDate.before(endDate)) {
+            error.append("- Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc.\n");
+        }
+
+        // Kiểm tra tên công việc không trùng lặp
+        List<Task> tasks = taskManager.getTasksForKey(key);
+        for (int i = 0; i < tasks.size(); i++) {
+            if (i == currentRow) continue; // Bỏ qua công việc hiện tại khi chỉnh sửa
+            if (tasks.get(i).getName().equalsIgnoreCase(name)) {
+                error.append("- Tên công việc đã tồn tại. Vui lòng chọn tên khác.\n");
+                break;
+            }
+        }
+
+        return error.toString();
     }
 
     // Thay đổi ngày dựa trên offset (trước hoặc sau)

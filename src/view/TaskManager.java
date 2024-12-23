@@ -65,4 +65,25 @@ public class TaskManager implements Serializable {
     public void clearAllTasks() {
         tasksByKey.clear();
     }
+
+    /**
+     * Kiểm tra xem tên công việc đã tồn tại trong khóa nhất định chưa
+     *
+     * @param key  Khóa kết hợp (ví dụ: "Daily_2023-10-05")
+     * @param name Tên công việc cần kiểm tra
+     * @param excludeIndex chỉ số của công việc cần loại trừ (sử dụng khi chỉnh sửa)
+     * @return     true nếu tên đã tồn tại, false nếu chưa
+     */
+    public boolean isTaskNameDuplicate(String key, String name, int excludeIndex) {
+        List<Task> tasks = tasksByKey.get(key);
+        if (tasks != null) {
+            for (int i = 0; i < tasks.size(); i++) {
+                if (i == excludeIndex) continue; // Bỏ qua công việc hiện tại khi chỉnh sửa
+                if (tasks.get(i).getName().equalsIgnoreCase(name)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
