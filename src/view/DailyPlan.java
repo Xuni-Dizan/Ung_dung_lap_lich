@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import view.RoundedBorder;
-import view.DropShadowBorder;
 
 import static javax.swing.BorderFactory.*;
 
@@ -28,7 +26,6 @@ public class DailyPlan extends JFrame {
     private TaskManager taskManager;
     private List<TodayPanel> todayPanels;
     private List<TabInfo> tabInfos; // Danh sách TabInfo
-    private boolean isDarkMode; // Thêm biến để kiểm soát chế độ Dark Mode
 
     public DailyPlan(Date selectedDate, TaskManager taskManager) {
         this.taskManager = taskManager;
@@ -60,7 +57,6 @@ public class DailyPlan extends JFrame {
         // Tạo panel chính
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
-        mainPanel.setOpaque(false);
 
         // Thanh tab
         tabbedPane = new JTabbedPane();
@@ -84,29 +80,24 @@ public class DailyPlan extends JFrame {
         // Thêm JPanel chứa nút "Add" và "Reset All" vào phía trên JTabbedPane
         JPanel addResetButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         addResetButtonPanel.setOpaque(false); 
-        JButton btnAddTab = createRoundedButton("+", new Color(52, 152, 219), Color.WHITE);
-        btnAddTab.setPreferredSize(new Dimension(40, 40));
-        btnAddTab.setToolTipText("Thêm Tab mới"); 
+        JButton btnAddTab = new JButton("+"); 
+        btnAddTab.setPreferredSize(new Dimension(40, 40)); 
+        btnAddTab.setBackground(new Color(52, 152, 219)); 
+        btnAddTab.setForeground(Color.WHITE); 
+        btnAddTab.setBorder(createLineBorder(Color.GRAY, 1, true));
+        btnAddTab.setFocusPainted(false);
+        btnAddTab.setToolTipText("Add New Tab"); 
 
         // Tạo nút "Reset All"
-        JButton btnResetAll = createRoundedButton("Reset All", new Color(231, 76, 60), Color.WHITE);
-        btnResetAll.setPreferredSize(new Dimension(120, 40));
+        JButton btnResetAll = new JButton("Reset All");
+        btnResetAll.setPreferredSize(new Dimension(100, 40));
+        btnResetAll.setBackground(new Color(231, 76, 60)); 
+        btnResetAll.setForeground(Color.WHITE); 
+        btnResetAll.setBorder(createLineBorder(Color.GRAY, 1, true));
+        btnResetAll.setFocusPainted(false);
         btnResetAll.setToolTipText("Reset tất cả dữ liệu");
 
-        // Thêm các nút vào panel
-        addResetButtonPanel.add(btnResetAll);
-        addResetButtonPanel.add(btnAddTab); 
-
-        mainPanel.add(addResetButtonPanel, BorderLayout.NORTH);
-        mainPanel.add(tabbedPane, BorderLayout.CENTER);
-
-        // Add the mainPanel to the JFrame
-        add(mainPanel, BorderLayout.CENTER);
-
-        // Make the frame visible
-        setVisible(true);
-
-        // Sự kiện cho nút "Add Tab"
+        // Tạo sự kiện click cho nút "Add"
         btnAddTab.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -116,19 +107,19 @@ public class DailyPlan extends JFrame {
                     addTodayPanel(tabTitle, currentDate);
                     TabInfo newTab = new TabInfo(tabTitle, currentDate);
                     tabInfos.add(newTab);
-                    saveTabsData(); 
+                    saveTabsData(); // Lưu danh sách tab sau khi thêm
                 }
             }
         });
 
-        // Sự kiện cho nút "Reset All"
+        // Tạo sự kiện click cho nút "Reset All"
         btnResetAll.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn reset tất cả dữ liệu?", "Xác nhận Reset", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     // Xóa dữ liệu trong TaskManager
-                    taskManager.clearAllTasks();
+                    taskManager.getTasksByKey().clear();
                     taskManager.saveToFile("tasks_data.dat");
 
                     // Xóa tất cả tab và thêm lại tab mặc định
@@ -145,44 +136,26 @@ public class DailyPlan extends JFrame {
                 }
             }
         });
-    }
 
-    // Phương thức tạo JButton bo góc
-    private JButton createRoundedButton(String text, Color bgColor, Color fgColor) {
-        JButton button = new JButton(text);
-        button.setFocusPainted(false);
-        button.setBackground(bgColor);
-        button.setForeground(fgColor);
-        button.setBorder(new RoundedBorder(15));
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        button.setPreferredSize(new Dimension(120, 40));
-        button.setFont(new Font("Roboto", Font.PLAIN, 14));
+        // Thêm các nút vào panel
+        addResetButtonPanel.add(btnResetAll);
+        addResetButtonPanel.add(btnAddTab);  // Thêm nút "Add" vào panel
 
-        // Bo góc
-        button.setBorder(BorderFactory.createCompoundBorder(
-            new RoundedBorder(15),
-            BorderFactory.createEmptyBorder(5, 15, 5, 15)
-        ));
+        mainPanel.add(addResetButtonPanel, BorderLayout.NORTH);
+        mainPanel.add(tabbedPane, BorderLayout.CENTER);
 
-        // Thêm hiệu ứng hover
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(bgColor.darker());
-            }
+        // Add the mainPanel to the JFrame
+        add(mainPanel, BorderLayout.CENTER);
 
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(bgColor);
-            }
-        });
-
-        return button;
+        // Make the frame visible
+        setVisible(true);
     }
 
     // Phương thức để thêm một TodayPanel mới
     private void addTodayPanel(String tabTitle, Date selectedDate) {
         TodayPanel newPanel = new TodayPanel(tabTitle, selectedDate, taskManager);
         todayPanels.add(newPanel);
-        tabbedPane.addTab(tabTitle, newPanel);
+        tabbedPane.addTab(tabTitle, newPanel); // Chỉ sử dụng tabTitle làm tiêu đề tab
     }
 
     // Lưu danh sách TabInfo vào tệp
@@ -199,18 +172,5 @@ public class DailyPlan extends JFrame {
     public void dispose() {
         saveTabsData();
         super.dispose();
-    }
-
-    public void toggleDarkMode(boolean isDarkMode) {
-        this.isDarkMode = isDarkMode;
-        // Cập nhật màu nền
-        getContentPane().setBackground(isDarkMode ? new Color(30, 30, 30) : new Color(245, 245, 245));
-        // Cập nhật các panel và tab
-        for (Component comp : tabbedPane.getComponents()) {
-            if (comp instanceof TodayPanel) {
-                ((TodayPanel) comp).toggleDarkMode(isDarkMode);
-            }
-        }
-        SwingUtilities.updateComponentTreeUI(this);
     }
 }

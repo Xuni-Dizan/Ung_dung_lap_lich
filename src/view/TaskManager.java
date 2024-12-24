@@ -15,7 +15,7 @@ public class TaskManager implements Serializable {
             Map<String, List<Task>> loadedMap = (Map<String, List<Task>>) ois.readObject();
             tasksByKey = loadedMap;
         } catch (Exception e) {
-            tasksByKey = new HashMap<>();
+            tasksByKey = new HashMap<>(); // Nếu tệp không tồn tại hoặc lỗi
         }
     }
 

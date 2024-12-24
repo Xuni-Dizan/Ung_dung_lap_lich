@@ -6,6 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="f9acab3f-a025-4982-8fe1-8963004b02ea" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EventController.java" beforeDir="false" afterPath="$PROJECT_DIR$/EventController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/view/CalendarGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/CalendarGUI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/view/DropShadowBorder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/DropShadowBorder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/view/TabInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/TabInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/view/TodayPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/TodayPanel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tabs_data.dat" beforeDir="false" afterPath="$PROJECT_DIR$/tabs_data.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tasks_data.dat" beforeDir="false" afterPath="$PROJECT_DIR$/tasks_data.dat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,23 +40,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.CalendarGUI.executor&quot;: &quot;Run&quot;,
-    &quot;Application.CalenderGUI.executor&quot;: &quot;Run&quot;,
-    &quot;Application.DailyPlan.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Dai23130039&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dizan/IdeaProjects/ComputerManagementSystem-main/ComputerManagementSystem-main&quot;,
-    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/Dizan/IdeaProjects/Ung_dung_lap_lich/src/Main.java&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.CalendarGUI.executor": "Run",
+    "Application.CalenderGUI.executor": "Run",
+    "Application.DailyPlan.executor": "Run",
+    "Application.Main.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "Dai23130039",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Dizan/IdeaProjects/laplich/Ung_dung_lap_lich",
+    "onboarding.tips.debug.path": "C:/Users/Dizan/IdeaProjects/Ung_dung_lap_lich/src/Main.java",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2"
   }
-}</component>
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
