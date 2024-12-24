@@ -15,7 +15,7 @@ public class TaskManager implements Serializable {
             Map<String, List<Task>> loadedMap = (Map<String, List<Task>>) ois.readObject();
             tasksByKey = loadedMap;
         } catch (Exception e) {
-            tasksByKey = new HashMap<>();
+            tasksByKey = new HashMap<>(); // Nếu tệp không tồn tại hoặc lỗi
         }
     }
 
@@ -64,35 +64,5 @@ public class TaskManager implements Serializable {
     // Thêm phương thức để clear tất cả tasks (sử dụng cho "Reset All")
     public void clearAllTasks() {
         tasksByKey.clear();
-    }
-
-    /**
-     * Kiểm tra xem tên công việc đã tồn tại trong khóa nhất định chưa
-     *
-     * @param key  Khóa kết hợp (ví dụ: "Daily_2023-10-05")
-     * @param name Tên công việc cần kiểm tra
-     * @param excludeIndex chỉ số của công việc cần loại trừ (sử dụng khi chỉnh sửa)
-     * @return     true nếu tên đã tồn tại, false nếu chưa
-     */
-    public boolean isTaskNameDuplicate(String key, String name, int excludeIndex) {
-        List<Task> tasks = tasksByKey.get(key);
-        if (tasks != null) {
-            for (int i = 0; i < tasks.size(); i++) {
-                if (i == excludeIndex) continue; // Bỏ qua công việc hiện tại khi chỉnh sửa
-                if (tasks.get(i).getName().equalsIgnoreCase(name)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Lấy danh sách các trạng thái hợp lệ cho công việc
-     *
-     * @return Danh sách các trạng thái hợp lệ
-     */
-    public List<String> getValidStatuses() {
-        return Arrays.asList("Hoàn thành", "Đang tiến hành", "Chưa bắt đầu", "Quá hạn");
     }
 }
