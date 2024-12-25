@@ -1,5 +1,9 @@
-import javax.swing.*;
+package test;
+import javax.swing.SwingUtilities;
 import java.util.Date;
+import java.util.List;
+import view.TaskManager;
+import view.Task;
 
 public class Test {
     public static void main(String[] args) {
