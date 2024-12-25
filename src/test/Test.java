@@ -1,8 +1,11 @@
 import javax.swing.SwingUtilities;
+
+import model.Task;
+import model.TaskManager;
+
 import java.util.Date;
 import java.util.List;
-import view.TaskManager;
-import view.Task;
+
 import view.CalendarGUI;
 
 public class Test {

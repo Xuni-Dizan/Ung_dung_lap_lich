@@ -1,5 +1,5 @@
 // src/view/TaskManager.java
-package view;
+package model;
 
 import java.io.*;
 import java.util.*;

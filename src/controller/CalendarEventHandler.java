@@ -1,8 +1,10 @@
 // src/view/CalendarEventHandler.java
-package view;
+package controller;
 
 import com.toedter.calendar.JDateChooser;
 
+import model.TaskManager;
+import view.DailyPlan;
 import javax.swing.*;
 import java.awt.*;
 // import java.awt.event.ActionEvent;
