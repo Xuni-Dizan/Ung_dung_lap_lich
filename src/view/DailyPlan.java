@@ -6,6 +6,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import com.toedter.calendar.JDateChooser;
+
+import model.TabInfo;
+import model.TaskManager;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.FileInputStream;

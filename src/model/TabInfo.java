@@ -1,5 +1,5 @@
 // src/view/TabInfo.java
-package view;
+package model;
 
 import java.io.Serializable;
 import java.util.Date;

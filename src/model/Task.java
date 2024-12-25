@@ -1,5 +1,5 @@
 // src/view/Task.java
-package view;
+package model;
 
 import java.io.Serializable;
 

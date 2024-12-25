@@ -5,6 +5,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import com.toedter.calendar.JDateChooser;
+
+import model.TaskManager;
+
 import java.awt.event.*;
 import java.util.Calendar;
 import java.util.Date;
@@ -325,7 +328,7 @@ public class CalendarGUI extends JFrame {
         SwingUtilities.invokeLater(() -> new DailyPlan(selectedDate, taskManager));
     }
 
-    public static void main(String[] args) {
-        new CalendarGUI();
-    }
+    // public static void main(String[] args) {
+    //     new CalendarGUI();
+    // }
 }

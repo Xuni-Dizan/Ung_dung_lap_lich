@@ -4,6 +4,10 @@ package view;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
+
+import model.Task;
+import model.TaskManager;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.time.LocalDate;
